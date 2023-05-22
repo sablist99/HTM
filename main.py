@@ -290,7 +290,7 @@ def selectCellAndSegmentForPattern(layer, w, prev_active_layer_state):
     for segment in layer[max_cell_coords[0]][max_cell_coords[1]]:
         segment[target_coords[0]][target_coords[1]][0] = permanence_threshold
         segment[target_coords[0]][target_coords[1]][1] = 1
-    print(max_cell_coords)
+    print("Клетка ", max_cell_coords, " будет указывать на ", target_coords)
     return
 
 
@@ -305,16 +305,13 @@ def rewardSynapses(layer, prev_active_layer_state, correctly_predirected_cells):
             for current_segment in layer[current_active_cell[0]][current_active_cell[1]]:
                 if current_segment[current_correctly_cell[0]][current_correctly_cell[1]][1] == 1:
                     # Поощеряем все синапсы этого сегмента
-                    for row in current_segment:
-                        for current_synapse in row:
-                            current_synapse[0] += p_plus
-                            current_synapse[1] = 1 if current_synapse[0] >= permanence_threshold else 0
+                    current_segment[current_correctly_cell[0]][current_correctly_cell[1]][0] += p_plus
 
 
 if __name__ == '__main__':
     brain = initBrain()
 
-    input_string = "DADADADADA"
+    input_string = "DADADADADADADADADADADADADADADADADADADADA"
 
     print("Исходная строка - ", input_string)
 
@@ -342,7 +339,7 @@ if __name__ == '__main__':
 
         correctly_predirected_cells = searchCorrectlyPredictedCells(layer_state, brain[current_layer], prev_layer_state, prev_layer_prediction)
 
-        print(correctly_predirected_cells)
+        print("Верно предсказаны ", correctly_predirected_cells)
 
         if isFirstIter == 1:
             isFirstIter = 0
