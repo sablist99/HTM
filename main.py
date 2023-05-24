@@ -152,6 +152,24 @@ def drawActiveStateLayerWithPrediction(layer, prediction):
     plt.show()
     return
 
+'''
+def addActiveAndPredictedCellsToOutput(layer, prediction, iteration):
+    i = 0
+    for row in range(M):
+        j = 0
+        i += 1
+        for element in range(N):
+            j += 1
+            if [i - 1, j - 1] in prediction:
+                axs[iteration].plot(j, i, marker='.', color="red")
+            elif [i - 1, j - 1] in layer:
+                axs[iteration].plot(j, i, marker='.', color="black")
+            else:
+                axs[iteration].plot(j, i, marker='.', color="gainsboro")
+
+
+    return
+'''
 def drawSegment(segment):
     i = 0
     for row in segment:
@@ -319,8 +337,9 @@ if __name__ == '__main__':
 
     brain = initBrain()
 
-    input_string_for_learning = "ABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCY"
-    input_string_for_testing = "BC"
+    #input_string_for_learning = "ABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCY"
+    input_string_for_learning = "ALTSTUALTSTUALTSTUALTSTUALTSTUALTSTUALTSTUALTSTUALTSTUALTSTUALTSTUALTSTUALTSTUALTSTUALTSTUALTSTUALTSTUALTSTUALTSTUALTSTU"
+    input_string_for_testing = "ALTSTU"
 
     print("Исходная строка - ", input_string_for_learning)
 
@@ -363,12 +382,9 @@ if __name__ == '__main__':
 
     active_cells = []
     predicted_cells = []
-    isFirstIter = 1
 
     # Тестирование
     for symbol in input_string_for_testing:
-        print("Обрабатываем символ ", symbol)
-        #В win_columns будут лежать номера столбцов, соответствубщие строке
         win_columns = selectWinColumns(symbol)
 
         prev_active_cells = active_cells
@@ -377,17 +393,8 @@ if __name__ == '__main__':
         active_cells = selectActiveCells(prev_predicted_cells, win_columns)
         predicted_cells = selectPredictedCells(brain[current_layer], active_cells)
 
+        #addActiveAndPredictedCellsToOutput(active_cells, predicted_cells, iteration)
         drawActiveStateLayerWithPrediction(active_cells, predicted_cells)
 
         correctly_predicted_cells = searchCorrectlyPredictedCells(active_cells, brain[current_layer], prev_active_cells, prev_predicted_cells)
 
-        print("Верно предсказаны ", correctly_predicted_cells)
-
-        if isFirstIter == 1:
-            isFirstIter = 0
-            continue
-        if correctly_predicted_cells == []:
-            # Если никто не предсказывал, а столб выстрелил
-            selectCellAndSegmentForPattern(brain[current_layer], win_columns, prev_active_cells)
-        else:
-            rewardSynapses(brain[current_layer], prev_active_cells, correctly_predicted_cells)
