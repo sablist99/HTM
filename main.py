@@ -152,24 +152,6 @@ def drawActiveStateLayerWithPrediction(layer, prediction):
     plt.show()
     return
 
-'''
-def addActiveAndPredictedCellsToOutput(layer, prediction, iteration):
-    i = 0
-    for row in range(M):
-        j = 0
-        i += 1
-        for element in range(N):
-            j += 1
-            if [i - 1, j - 1] in prediction:
-                axs[iteration].plot(j, i, marker='.', color="red")
-            elif [i - 1, j - 1] in layer:
-                axs[iteration].plot(j, i, marker='.', color="black")
-            else:
-                axs[iteration].plot(j, i, marker='.', color="gainsboro")
-
-
-    return
-'''
 def drawSegment(segment):
     i = 0
     for row in segment:
@@ -314,7 +296,7 @@ def selectCellAndSegmentForPattern(layer, w, prev_active_layer_state):
     for segment in layer[max_cell_coords[0]][max_cell_coords[1]]:
         segment[target_coords[0]][target_coords[1]][0] = permanence_threshold
         segment[target_coords[0]][target_coords[1]][1] = 1
-    print("Клетка ", max_cell_coords, " будет указывать на ", target_coords)
+    # print("Клетка ", max_cell_coords, " будет указывать на ", target_coords)
     return
 
 
@@ -333,52 +315,53 @@ def rewardSynapses(layer, prev_active_layer_state, correctly_predirected_cells):
 
 
 if __name__ == '__main__':
-
-
+    file = open("input.dat", "r")
+    input_strings = file.read().splitlines()
     brain = initBrain()
 
     #input_string_for_learning = "ABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCYXBCY"
-    input_string_for_learning = "ALTSTU"
+    #input_string_for_learning = "ALTSTU"
     learning_iterations = 20
     input_string_for_testing = "ALTSTU"
 
-    print("Исходная строка - ", input_string_for_learning)
 
     predicted_cells = []
     for i in range(layer_count):
         predicted_cells.append([])
 
     # Обучение
-    for i in range(learning_iterations):
-        active_cells = []
-        predicted_cells = []
-        current_layer = 0
-        isFirstIter = 1
-        for symbol in input_string_for_learning:
-            #print("Обрабатываем символ ", symbol)
-            #В win_columns будут лежать номера столбцов, соответствубщие строке
-            win_columns = selectWinColumns(symbol)
+    for current_string in input_strings:
+        print("Изучаем строку - ", current_string)
+        for i in range(learning_iterations):
+            active_cells = []
+            predicted_cells = []
+            current_layer = 0
+            isFirstIter = 1
+            for symbol in current_string:
+                #print("Обрабатываем символ ", symbol)
+                #В win_columns будут лежать номера столбцов, соответствубщие строке
+                win_columns = selectWinColumns(symbol)
 
-            prev_active_cells = active_cells
-            prev_predicted_cells = predicted_cells
+                prev_active_cells = active_cells
+                prev_predicted_cells = predicted_cells
 
-            active_cells = selectActiveCells(prev_predicted_cells, win_columns)
-            predicted_cells = selectPredictedCells(brain[current_layer], active_cells)
+                active_cells = selectActiveCells(prev_predicted_cells, win_columns)
+                predicted_cells = selectPredictedCells(brain[current_layer], active_cells)
 
-            #drawActiveStateLayerWithPrediction(active_cells, predicted_cells)
+                #drawActiveStateLayerWithPrediction(active_cells, predicted_cells)
 
-            correctly_predicted_cells = searchCorrectlyPredictedCells(active_cells, brain[current_layer], prev_active_cells, prev_predicted_cells)
+                correctly_predicted_cells = searchCorrectlyPredictedCells(active_cells, brain[current_layer], prev_active_cells, prev_predicted_cells)
 
-            #print("Верно предсказаны ", correctly_predicted_cells)
+                #print("Верно предсказаны ", correctly_predicted_cells)
 
-            if isFirstIter == 1:
-                isFirstIter = 0
-                continue
-            if correctly_predicted_cells == []:
-                # Если никто не предсказывал, а столб выстрелил
-                selectCellAndSegmentForPattern(brain[current_layer], win_columns, prev_active_cells)
-            else:
-                rewardSynapses(brain[current_layer], prev_active_cells, correctly_predicted_cells)
+                if isFirstIter == 1:
+                    isFirstIter = 0
+                    continue
+                if correctly_predicted_cells == []:
+                    # Если никто не предсказывал, а столб выстрелил
+                    selectCellAndSegmentForPattern(brain[current_layer], win_columns, prev_active_cells)
+                else:
+                    rewardSynapses(brain[current_layer], prev_active_cells, correctly_predicted_cells)
 
     active_cells = []
     predicted_cells = []
@@ -393,7 +376,7 @@ if __name__ == '__main__':
         active_cells = selectActiveCells(prev_predicted_cells, win_columns)
         predicted_cells = selectPredictedCells(brain[current_layer], active_cells)
 
-        #addActiveAndPredictedCellsToOutput(active_cells, predicted_cells, iteration)
+        # addActiveAndPredictedCellsToOutput(active_cells, predicted_cells, iteration)
         drawActiveStateLayerWithPrediction(active_cells, predicted_cells)
 
         correctly_predicted_cells = searchCorrectlyPredictedCells(active_cells, brain[current_layer], prev_active_cells, prev_predicted_cells)
